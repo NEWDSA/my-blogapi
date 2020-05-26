@@ -1,0 +1,21 @@
+{
+  "name": "blog-api",
+  "version": "1.0.0",
+  "description": "my-blog api",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "server.js"
+  },
+  "keywords": [
+    "javascript",
+    "vue",
+    "express"
+  ],
+  "author": "Luciano",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.17.1",
+    "mssql": "^6.2.0"
+  }
+}
