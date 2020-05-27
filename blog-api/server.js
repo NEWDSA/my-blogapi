@@ -8,7 +8,7 @@ var config = {
   password: '123',
   server: 'localhost',
   port: 1433,
-  database: 'myapi',
+  database: 'Luciano_DB',
   options: {
     encrypt: false,// 是否加密，本地为false, 部署后为true 
   },
@@ -66,11 +66,9 @@ var config = {
 //     })
 //   })
 // });
-app.get('/albums/', function (req, res) {
-
-
+app.get('/note/', function (req, res) {
   sql.connect(config).then(() => {
-    return sql.query`select * from photoinfo`
+    return sql.query`select * from Luciano_Note`
   }).then(result => {
     var data = result.recordset;
     // res.send(data);
