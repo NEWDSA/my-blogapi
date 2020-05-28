@@ -19,7 +19,6 @@ var config = {
   }
 }
 
-
 // app.post('/upload', function (req, res) {
 //   let sampleFile;
 //   let uploadPath;
@@ -82,12 +81,45 @@ app.get('/note/', function (req, res) {
   }).catch(err => {
     // ... error checks
   })
-
   sql.on('error', err => {
     // ... error handler
   })
-
 });
+app.get('/photo',function(req,res){
+  sql.connect(config).then(()=>{
+    return sql.query`select * from Luciano_Photo`
+  }).then(result=>{
+    var data=result.recordset;
+    res.send(data);
+  }).catch(err=>{
+      console.log(err);
+  });
+   sql.on('error',err=>{
+     console.log(err);
+   })
+});
+
+app.get('/search:userid', function (req, res) {
+ var par=req.params.userid.replace(':','');
+  sql.connect(config, function (err) {
+    if (err) {
+      console.log(err);
+    }
+    var request = new sql.Request();
+    var test=par;
+    request.input('content', sql.NVarChar, test);
+    console.log(test)
+    request.execute('Luciano_TS', function (err, recordsets) {
+      if (err) {
+        console.log(err);
+      }
+      var str = JSON.stringify(recordsets);
+      res.send(recordsets);
+      console.log(recordsets);
+    })
+  })
+});
+
 
 
 app.listen(8000, () => {
