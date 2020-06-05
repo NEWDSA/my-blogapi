@@ -1,6 +1,6 @@
 var express = require('express');
 var app = express();
-
+var URL=require('url')
 const sql = require('mssql')
     //standard tedious config object : http://tediousjs.github.io/tedious/api-connection.html#function_newConnection
 var config = {
@@ -99,11 +99,11 @@ app.get('/albums', function(req, res) {
     })
 });
 
-app.get('/photo/:id', function(req, res) {
-   const id= req.params;
-   console.log(id);
+app.get('/photo', function(req, res) {
+   var params=URL.parse(req.url,true).query
+   console.log(params.id);
     sql.connect(config).then(() => {
-        return sql.query `select * from Luciano_Photo`
+        return sql.query `select * from Luciano_Photo where id=${params.id}`
     }).then(result => {
         var data = result.recordset;
         res.send(data);
