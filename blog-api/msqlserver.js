@@ -102,20 +102,19 @@ app.get('/albums', function(req, res) {
 app.get('/photo', function(req, res) {
    var params=URL.parse(req.url,true).query
    id=params.id;
-    sql.connect(config).then(() => {
-        console.log(id)
-        return sql.query `select * from Luciano_Photo where albumsid=${id}`
-       
-    }).then(result => {
-        var data = result.recordset;
-        res.send(data);
-    }).catch(err => {
-        console.log(err);
-    });
-    sql.on('error', err => {
-        console.log(err);
+   sql.connect(config).query(`select * from Luciano_Photo where albumsid=${id}`).then(result => {
+    var data = result.recordset;
+    res.send(data);
+})
+  
+function con(){
+    var dbConn=new sql.ConnectionError(config);
+    dbConn.connect().then(function(){
+        console.log("connected")
+    }).catch(function(err){
+        
     })
-
+}
    
 });
 
