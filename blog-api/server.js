@@ -101,9 +101,9 @@ app.get('/albums', function(req, res) {
 
 app.get('/photo', function(req, res) {
    var params=URL.parse(req.url,true).query
-   id=params.id;
+   
+  var id=params.userId
     sql.connect(config).then(() => {
-        console.log(id)
         return sql.query `select * from Luciano_Photo where albumsid=${id}`
        
     }).then(result => {
