@@ -2,6 +2,9 @@ var express = require('express');
 var app = express();
 var URL=require('url')
 const sql = require('mssql')
+var bodyParser = require('body-parser');/*post方法*/
+app.use(bodyParser.json());// 添加json解析
+app.use(bodyParser.urlencoded({extended: false}));
     //standard tedious config object : http://tediousjs.github.io/tedious/api-connection.html#function_newConnection
 var config = {
     user: 'sa',
@@ -67,7 +70,7 @@ var config = {
 // });
 app.get('/note/', function(req, res) {
     sql.connect(config).then(() => {
-        return sql.query `select * from Luciano_Note`
+        return sql.query `select * from Luciano_Note order by insertTime desc`
     }).then(result => {
         var data = result.recordset;
         // res.send(data);
@@ -140,7 +143,27 @@ app.get('/search:userid', function(req, res) {
     })
 });
 
-
+app.post('/publish',function(req,res){
+    // var params=req.body
+    var content=req.body.content
+    var title=req.body.title
+    sql.connect(config, function(err) {
+        if (err) {
+            console.log(err);
+        }
+        var request = new sql.Request();
+        request.input('content', sql.NVarChar, content);
+        request.input('title',sql.NVarChar,title)
+        request.execute('Luciano_insert_Note', function(err, recordsets) {
+            if (err) {
+                console.log(err);
+            }
+            var str = JSON.stringify(recordsets);
+            res.send(recordsets);
+            console.log(recordsets);
+        })
+    })
+})
 
 app.listen(8000, () => {
     console.log('app listening on 8000');
