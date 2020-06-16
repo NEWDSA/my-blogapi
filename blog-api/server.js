@@ -3,8 +3,8 @@ var app = express();
 var URL=require('url')
 const sql = require('mssql')
 var bodyParser = require('body-parser');/*post方法*/
-app.use(bodyParser.json());// 添加json解析
-app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.json({limit:'3000mb'}));// 添加json解析   设置上传图片大小
+app.use(bodyParser.urlencoded({limit:'3000mb',extended: false})); //设置上传图片大小
     //standard tedious config object : http://tediousjs.github.io/tedious/api-connection.html#function_newConnection
 var config = {
     user: 'sa',
