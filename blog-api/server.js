@@ -164,7 +164,23 @@ app.post('/publish',function(req,res){
         })
     })
 })
-
+app.post('/login',function(req,res){
+    var username=req.body.form.username;
+    var password=req.body.form.password;
+    sql.connect(config,function(err){
+        
+        return sql.query `select * from [dbo].[Luciano_Login] where username=${username} and password=${password}`
+        
+    }).then(result => {
+        var data = result.recordset;
+        res.send(data);
+    }).catch(err => {
+        // ... error checks
+    })
+    sql.on('error', err => {
+        // ... error handler
+    })
+})
 app.listen(8000, () => {
     console.log('app listening on 8000');
     // console.log(path.join(__dirname, "public", "file.html"));
