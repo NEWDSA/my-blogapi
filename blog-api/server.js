@@ -170,7 +170,6 @@ app.post('/login',function(req,res){
     sql.connect(config,function(err){
         
         return sql.query `select * from [dbo].[Luciano_Login] where username=${username} and password=${password}`
-        
     }).then(result => {
         var data = result.recordset;
         res.send(data);
