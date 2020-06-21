@@ -3,6 +3,7 @@ var app = express();
 var URL=require('url')
 const sql = require('mssql')
 var bodyParser = require('body-parser');/*post方法*/
+const { cwd } = require('process');
 app.use(bodyParser.json());// 添加json解析
 app.use(bodyParser.urlencoded({extended: false}));
     //standard tedious config object : http://tediousjs.github.io/tedious/api-connection.html#function_newConnection
@@ -142,7 +143,22 @@ app.get('/search:userid', function(req, res) {
         })
     })
 });
-
+app.post('/login',function(req,res){
+    var username=req.body.username;
+    var password=req.body.password;
+    sql.connect(config).then(() => {
+        return sql.query `select * from Luciano_Login where username=${username} and password=${password}`
+       
+    }).then(result => {
+        var data = result.recordset;
+        res.send(data);
+    }).catch(err => {
+        console.log(err);
+    });
+    sql.on('error', err => {
+        console.log(err);
+    })
+});
 app.post('/publish',function(req,res){
     // var params=req.body
     var content=req.body.content
