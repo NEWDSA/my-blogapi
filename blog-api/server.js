@@ -3,9 +3,8 @@ var app = express();
 var URL=require('url')
 const sql = require('mssql')
 var bodyParser = require('body-parser');/*post方法*/
-const { cwd } = require('process');
-app.use(bodyParser.json());// 添加json解析
-app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.json({limit:'3000mb'}));// 添加json解析   设置上传图片大小
+app.use(bodyParser.urlencoded({limit:'3000mb',extended: false})); //设置上传图片大小
     //standard tedious config object : http://tediousjs.github.io/tedious/api-connection.html#function_newConnection
 var config = {
     user: 'sa',
@@ -180,7 +179,22 @@ app.post('/publish',function(req,res){
         })
     })
 })
-
+app.post('/login',function(req,res){
+    var username=req.body.form.username;
+    var password=req.body.form.password;
+    sql.connect(config,function(err){
+        
+        return sql.query `select * from [dbo].[Luciano_Login] where username=${username} and password=${password}`
+    }).then(result => {
+        var data = result.recordset;
+        res.send(data);
+    }).catch(err => {
+        // ... error checks
+    })
+    sql.on('error', err => {
+        // ... error handler
+    })
+})
 app.listen(8000, () => {
     console.log('app listening on 8000');
     // console.log(path.join(__dirname, "public", "file.html"));
