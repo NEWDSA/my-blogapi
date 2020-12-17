@@ -8,7 +8,7 @@ app.use(bodyParser.urlencoded({limit:'3000mb',extended: false})); //设置上传
     //standard tedious config object : http://tediousjs.github.io/tedious/api-connection.html#function_newConnection
 var config = {
     user: 'sa',
-    password: '123',
+    password: 'Luciano',
     server: 'localhost',
     port: 1433,
     database: 'Luciano_DB',
@@ -195,6 +195,31 @@ app.post('/login',function(req,res){
         // ... error handler
     })
 })
+
+/**
+ * 增加计划
+ */
+app.post('/addPlan',function(req,res){
+    var date=req.body.Date;
+    var content=req.body.myContent;
+    sql.connect(config,function(err){
+        if(err){
+            console.log(err);
+        }
+        var request=new sql.Request();
+        request.input('mydate',sql.Date,date);
+        request.input('content',sql.NVarChar,content);
+        request.execute('AddPlan',function(err,recordsets){
+            if(err){
+                console.log(err);
+            }
+            var str=JSON.stringify(recordsets);
+            res.send(recordsets);
+            console.log(recordsets);
+        })
+    })
+})
+
 app.listen(8000, () => {
     console.log('app listening on 8000');
     // console.log(path.join(__dirname, "public", "file.html"));
