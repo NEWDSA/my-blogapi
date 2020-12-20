@@ -1,11 +1,11 @@
 var express = require('express');
 var app = express();
-var URL=require('url')
+var URL = require('url')
 const sql = require('mssql')
 var bodyParser = require('body-parser');/*post方法*/
-app.use(bodyParser.json({limit:'3000mb'}));// 添加json解析   设置上传图片大小
-app.use(bodyParser.urlencoded({limit:'3000mb',extended: false})); //设置上传图片大小
-    //standard tedious config object : http://tediousjs.github.io/tedious/api-connection.html#function_newConnection
+app.use(bodyParser.json({ limit: '3000mb' }));// 添加json解析   设置上传图片大小
+app.use(bodyParser.urlencoded({ limit: '3000mb', extended: false })); //设置上传图片大小
+//standard tedious config object : http://tediousjs.github.io/tedious/api-connection.html#function_newConnection
 var config = {
     user: 'sa',
     password: 'Luciano',
@@ -68,9 +68,9 @@ var config = {
 //     })
 //   })
 // });
-app.get('/note/', function(req, res) {
+app.get('/note/', function (req, res) {
     sql.connect(config).then(() => {
-        return sql.query `select * from Luciano_Note order by insertTime desc`
+        return sql.query`select * from Luciano_Note order by insertTime desc`
     }).then(result => {
         var data = result.recordset;
         // res.send(data);
@@ -88,9 +88,10 @@ app.get('/note/', function(req, res) {
         // ... error handler
     })
 });
-app.get('/albums', function(req, res) {
+
+app.get('/albums', function (req, res) {
     sql.connect(config).then(() => {
-        return sql.query `select * from albums`
+        return sql.query`select * from albums`
     }).then(result => {
         var data = result.recordset;
         res.send(data);
@@ -102,13 +103,13 @@ app.get('/albums', function(req, res) {
     })
 });
 
-app.get('/photo', function(req, res) {
-   var params=URL.parse(req.url,true).query
-   
-  var id=params.ph
+app.get('/photo', function (req, res) {
+    var params = URL.parse(req.url, true).query
+
+    var id = params.ph
     sql.connect(config).then(() => {
-        return sql.query `select * from Luciano_Photo where albumsid=${id}`
-       
+        return sql.query`select * from Luciano_Photo where albumsid=${id}`
+
     }).then(result => {
         var data = result.recordset;
         res.send(data);
@@ -119,12 +120,11 @@ app.get('/photo', function(req, res) {
         console.log(err);
     })
 
-   
 });
 
-app.get('/search:userid', function(req, res) {
+app.get('/search:userid', function (req, res) {
     var par = req.params.userid.replace(':', '');
-    sql.connect(config, function(err) {
+    sql.connect(config, function (err) {
         if (err) {
             console.log(err);
         }
@@ -132,7 +132,7 @@ app.get('/search:userid', function(req, res) {
         var test = par;
         request.input('content', sql.NVarChar, test);
         console.log(test)
-        request.execute('Luciano_TS', function(err, recordsets) {
+        request.execute('Luciano_TS', function (err, recordsets) {
             if (err) {
                 console.log(err);
             }
@@ -142,12 +142,13 @@ app.get('/search:userid', function(req, res) {
         })
     })
 });
-app.post('/login',function(req,res){
-    var username=req.body.username;
-    var password=req.body.password;
+
+app.post('/login', function (req, res) {
+    var username = req.body.username;
+    var password = req.body.password;
     sql.connect(config).then(() => {
-        return sql.query `select * from Luciano_Login where username=${username} and password=${password}`
-       
+        return sql.query`select * from Luciano_Login where username=${username} and password=${password}`
+
     }).then(result => {
         var data = result.recordset;
         res.send(data);
@@ -158,18 +159,18 @@ app.post('/login',function(req,res){
         console.log(err);
     })
 });
-app.post('/publish',function(req,res){
+app.post('/publish', function (req, res) {
     // var params=req.body
-    var content=req.body.content
-    var title=req.body.title
-    sql.connect(config, function(err) {
+    var content = req.body.content
+    var title = req.body.title
+    sql.connect(config, function (err) {
         if (err) {
             console.log(err);
         }
         var request = new sql.Request();
         request.input('content', sql.NVarChar, content);
-        request.input('title',sql.NVarChar,title)
-        request.execute('Luciano_insert_Note', function(err, recordsets) {
+        request.input('title', sql.NVarChar, title)
+        request.execute('Luciano_insert_Note', function (err, recordsets) {
             if (err) {
                 console.log(err);
             }
@@ -179,12 +180,57 @@ app.post('/publish',function(req,res){
         })
     })
 })
-app.post('/login',function(req,res){
-    var username=req.body.form.username;
-    var password=req.body.form.password;
-    sql.connect(config,function(err){
+
+// app.post('/login', function (req, res) {
+//     var username = req.body.form.username;
+//     var password = req.body.form.password;
+//     sql.connect(config, function (err) {
+
+//         return sql.query`select * from [dbo].[Luciano_Login] where username=${username} and password=${password}`
+//     }).then(result => {
+//         var data = result.recordset;
+//         res.send(data);
+//     }).catch(err => {
+//         // ... error checks
+//     })
+//     sql.on('error', err => {
+//         // ... error handler
+//     })
+// })
+
+/**
+ * 增加计划
+ */
+app.post('/addPlan', function (req, res) {
+    var mydate = req.body.mydate;
+    var content = req.body.content;
+    sql.connect(config, function (err) {
+        if (err) {
+            console.log(err);
+        }
+        var request = new sql.Request();
+        request.input('mydate', sql.Date, mydate);
+        request.input('content', sql.NVarChar, content);
+        request.execute('AddPlan', function (err, recordsets) {
+            if (err) {
+                console.log(err);
+            }
+            var str = JSON.stringify(recordsets);
+            res.send(recordsets);
+            console.log(recordsets);
+        })
+    })
+})
+
+/**
+ * 查看日历计划
+ */
+app.post('/seePlan', function (req, res) {
+    var mydate = req.body.mydate;//日期
+    sql.connect(config, function (err) {
+
+        return sql.query `select * from Luciano_Plan where Date='2020-12-18'`
         
-        return sql.query `select * from [dbo].[Luciano_Login] where username=${username} and password=${password}`
     }).then(result => {
         var data = result.recordset;
         res.send(data);
@@ -194,31 +240,9 @@ app.post('/login',function(req,res){
     sql.on('error', err => {
         // ... error handler
     })
+
 })
 
-/**
- * 增加计划
- */
-app.post('/addPlan',function(req,res){
-    var date=req.body.Date;
-    var content=req.body.myContent;
-    sql.connect(config,function(err){
-        if(err){
-            console.log(err);
-        }
-        var request=new sql.Request();
-        request.input('mydate',sql.Date,date);
-        request.input('content',sql.NVarChar,content);
-        request.execute('AddPlan',function(err,recordsets){
-            if(err){
-                console.log(err);
-            }
-            var str=JSON.stringify(recordsets);
-            res.send(recordsets);
-            console.log(recordsets);
-        })
-    })
-})
 
 app.listen(8000, () => {
     console.log('app listening on 8000');
