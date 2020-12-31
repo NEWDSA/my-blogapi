@@ -181,22 +181,23 @@ app.post('/publish', function (req, res) {
     })
 })
 
-// app.post('/login', function (req, res) {
-//     var username = req.body.form.username;
-//     var password = req.body.form.password;
-//     sql.connect(config, function (err) {
 
-//         return sql.query`select * from [dbo].[Luciano_Login] where username=${username} and password=${password}`
-//     }).then(result => {
-//         var data = result.recordset;
-//         res.send(data);
-//     }).catch(err => {
-//         // ... error checks
-//     })
-//     sql.on('error', err => {
-//         // ... error handler
-//     })
-// })
+app.post('/login', function (req, res) {
+    var username = req.body.username;
+    var password = req.body.password;
+    sql.connect(config).then(() => {
+        return sql.query`select * from Luciano_Login where username=${username} and password=${password}`
+
+    }).then(result => {
+        var data = result.recordset;
+        res.send(data);
+    }).catch(err => {
+        console.log(err);
+    });
+    sql.on('error', err => {
+        console.log(err);
+    })
+});
 
 /**
  * 增加计划
@@ -226,23 +227,50 @@ app.post('/addPlan', function (req, res) {
  * 查看日历计划
  */
 app.post('/seePlan', function (req, res) {
-    var mydate = req.body.mydate;//日期
+    //添加搜索条件
+    var mydate = req.body.mydate; //条件判断
     sql.connect(config, function (err) {
-
-        return sql.query `select * from Luciano_Plan where Date='2020-12-18'`
-        
-    }).then(result => {
-        var data = result.recordset;
-        res.send(data);
-    }).catch(err => {
-        // ... error checks
+        if (err) {
+            console.log(err);
+        }
+        var request = new sql.Request();
+        request.input('mydate', sql.NVarChar(100), mydate);
+        request.execute('seePlan', function (err, recordsets) {
+            if (err) {
+                console.log(err);
+            }
+            var str = JSON.stringify(recordsets);
+            res.send(recordsets);
+            console.log(recordsets);
+        })
     })
-    sql.on('error', err => {
-        // ... error handler
+
+});
+
+//修改日历计划
+app.post('/upDateSeePlan', function (req, res) {
+    //添加参数
+    var mydate = req.body.myDate;
+    
+    var mycontent=req.body.myConten;
+    console.log(mycontent,mydate);
+    sql.connect(config, function (err) {
+        if (err) {
+            console.log(err);
+        }
+        var request = new sql.Request();
+        request.input('myConten',sql.NVarChar(100),mycontent);
+        request.input('myDate',sql.NVarChar(100),mydate);
+        request.execute('LucianoPlan_Update',function(err,recordsets){
+            if(err){
+                console.log(err);
+            }
+            var str=JSON.stringify(recordsets);
+            res.send(recordsets);
+            console.log(str);
+        })
     })
-
-})
-
+});
 
 app.listen(8000, () => {
     console.log('app listening on 8000');
